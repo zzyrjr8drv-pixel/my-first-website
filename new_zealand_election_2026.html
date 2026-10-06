@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aotearoa Election Desk — 2026</title>
+<meta name="description" content="Interactive New Zealand 2026 election polling and coalition dashboard.">
+<style>
+:root{
+ --bg:#061019;--bg2:#0b1822;--panel:rgba(13,29,39,.78);--panel2:#112530;
+ --line:rgba(255,255,255,.09);--text:#f4f8fa;--muted:#879ba7;
+ --cyan:#55e4ff;--blue:#4f8cff;--green:#48d18a;--red:#ff6675;--gold:#f3d33a;
+ --shadow:0 30px 90px rgba(0,0,0,.35)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:
+radial-gradient(circle at 8% -10%,#163b46 0,transparent 30%),
+radial-gradient(circle at 95% 5%,#182b5b 0,transparent 28%),
+linear-gradient(145deg,#061019,#07131d 48%,#03090e);min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(#000,transparent 82%)}
+.app{width:min(1480px,calc(100% - 28px));margin:auto}
+.top{position:sticky;top:10px;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:14px;margin:10px 0 18px;padding:10px;border:1px solid var(--line);background:rgba(4,14,22,.76);backdrop-filter:blur(22px);border-radius:18px;box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:-.025em}.fern{width:37px;height:37px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#50e0c4,#4b8cff);color:#031019;font-size:18px;box-shadow:0 0 30px rgba(80,224,196,.25)}
+.nav{display:flex;gap:3px}.nav button{border:0;background:transparent;color:#8295a2;border-radius:10px;padding:10px 12px;cursor:pointer;transition:.2s}.nav button:hover,.nav button.active{color:#fff;background:rgba(255,255,255,.07)}
+.live{display:flex;align-items:center;gap:7px;font-size:10px;color:#9eb0bb;letter-spacing:.1em}.pulse{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 14px var(--green);animation:pulse 1.5s infinite}@keyframes pulse{50%{opacity:.35;transform:scale(.65)}}
+.hero{position:relative;overflow:hidden;display:grid;grid-template-columns:1.5fr .7fr;gap:30px;padding:48px 44px;border:1px solid var(--line);border-radius:30px;background:linear-gradient(130deg,rgba(18,45,53,.92),rgba(9,23,36,.74));box-shadow:var(--shadow)}
+.hero:after{content:"";position:absolute;width:520px;height:520px;right:-230px;top:-300px;border-radius:50%;background:radial-gradient(circle,rgba(85,228,255,.22),transparent 67%);animation:float 10s ease-in-out infinite alternate}@keyframes float{to{transform:translate(-80px,80px) scale(1.12)}}
+.kicker{font-size:10px;letter-spacing:.17em;text-transform:uppercase;color:var(--cyan);font-weight:800}.hero h1{font-size:clamp(45px,6.4vw,82px);line-height:.9;letter-spacing:-.065em;margin:13px 0 18px;max-width:850px}.hero p{color:#a9bac3;max-width:720px;line-height:1.75;font-size:15px}.heroRight{align-self:end;text-align:right}.count{font-size:39px;font-weight:900;letter-spacing:-.05em}.datepill{display:inline-block;margin-top:12px;padding:8px 11px;border:1px solid var(--line);border-radius:999px;color:#cad6dc;background:rgba(255,255,255,.04);font-size:11px}
+.ticker{display:flex;gap:25px;overflow:auto;white-space:nowrap;padding:12px 3px 5px;color:#8396a4;font-size:11px}.ticker b{color:#eef4f6}.ticker em{font-style:normal}.up{color:var(--green)}.down{color:var(--red)}
+.controls{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:25px 0 14px}.tabs{display:flex;gap:6px;overflow:auto}.tabs button{white-space:nowrap;border:1px solid var(--line);background:rgba(255,255,255,.035);color:#91a4af;padding:10px 13px;border-radius:11px;cursor:pointer;transition:.2s}.tabs button:hover,.tabs button.active{background:#fff;color:#061019;border-color:#fff}.buttons{display:flex;gap:7px}.btn{border:1px solid var(--line);background:rgba(255,255,255,.045);color:#c8d4da;border-radius:11px;padding:10px 12px;cursor:pointer}.btn:hover{background:rgba(255,255,255,.09)}
+.view{display:none;animation:enter .4s ease}.view.active{display:block}@keyframes enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(18px);border-radius:19px;box-shadow:0 15px 50px rgba(0,0,0,.18)}.kpi{padding:19px;position:relative;overflow:hidden}.kpi:after{content:"";position:absolute;right:-40px;bottom:-60px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(85,228,255,.13),transparent 68%)}.label{font-size:10px;text-transform:uppercase;letter-spacing:.13em;color:#718693}.big{font-size:32px;font-weight:900;letter-spacing:-.05em;margin-top:7px}.sub{color:#8296a3;font-size:11px;margin-top:3px}
+.twocol{display:grid;grid-template-columns:1.45fr .85fr;gap:12px;margin-top:12px}.head{display:flex;justify-content:space-between;align-items:center;padding:19px 19px 10px}.title{font-size:14px;font-weight:800}.meta{font-size:10px;color:#718592}.body{padding:8px 19px 20px}.badge{font-size:9px;padding:5px 7px;border-radius:999px;background:rgba(85,228,255,.09);border:1px solid rgba(85,228,255,.18);color:#80e9ff}
+.bars{display:grid;gap:14px;padding-top:8px}.bar{display:grid;grid-template-columns:54px 1fr 52px;gap:10px;align-items:center}.code{font-size:11px;font-weight:850}.track{height:12px;border-radius:99px;background:#14252f;overflow:hidden}.fill{height:100%;border-radius:inherit;transition:width .8s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 15px color-mix(in srgb,var(--c) 35%,transparent)}.value{text-align:right;font-weight:850;font-variant-numeric:tabular-nums}
+.ranking{display:grid;gap:4px}.rank{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;padding:9px;border-radius:11px}.rank:hover{background:rgba(255,255,255,.05)}.rankNo{color:#5e7380;font-size:10px}.rankName{font-weight:700;font-size:12px}.mini{height:4px;background:#14252f;border-radius:9px;overflow:hidden;margin-top:5px}.mini i{display:block;height:100%;border-radius:9px}
+.trend{height:220px;padding:5px 16px 18px}.trend svg{width:100%;height:100%;overflow:visible}.feed{display:grid}.feeditem{display:grid;grid-template-columns:70px 1fr;gap:10px;padding:11px 19px;border-top:1px solid var(--line);font-size:11px;color:#b7c5cc}.feedtime{color:#607682;font-variant-numeric:tabular-nums}
+.blocs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.bloc{padding:18px}.blocbar{display:flex;height:18px;border-radius:6px;overflow:hidden;margin-top:12px}.blocbar i{height:100%;transition:width .8s}.blocMeta{display:flex;justify-content:space-between;color:#8497a2;font-size:10px;margin-top:7px}
+.seatlayout{display:grid;grid-template-columns:1.45fr .55fr;gap:12px}.parliamentWrap{padding-bottom:20px}.parliament{width:100%;height:auto}.seatdot{cursor:pointer;transition:.2s}.seatdot:hover{filter:brightness(1.5);transform-origin:center;transform:scale(1.45)}.seatList{display:grid;gap:7px;padding:8px 19px 20px}.seatRow{display:grid;grid-template-columns:35px 1fr 38px;gap:8px;align-items:center;padding:8px;border-radius:10px}.seatRow:hover{background:rgba(255,255,255,.045)}.seatColor{width:8px;height:8px;border-radius:3px}.seatName{font-size:11px;font-weight:750}.seatNo{font-weight:900;text-align:right}.majority{position:relative;margin:10px 19px 0;height:10px;background:#172a34;border-radius:99px}.majority:after{content:"";position:absolute;left:50.83%;top:-5px;height:20px;width:2px;background:#fff;opacity:.8}.majorityFill{height:100%;border-radius:99px;background:linear-gradient(90deg,#4f8cff,#55e4ff)}
+.coalitions{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.coalition{padding:19px;position:relative;overflow:hidden}.coalition.good{border-color:rgba(72,209,138,.3);background:linear-gradient(135deg,rgba(72,209,138,.07),rgba(255,255,255,.02))}.ctop{display:flex;justify-content:space-between;gap:10px}.cname{font-weight:850}.status{font-size:9px;border-radius:99px;padding:5px 7px;background:rgba(255,102,117,.1);color:#ff8995}.good .status{background:rgba(72,209,138,.1);color:#75e7a0}.cseats{font-size:45px;font-weight:950;letter-spacing:-.06em;margin:19px 0 2px}.cmeter{height:8px;background:#14252f;border-radius:99px;overflow:hidden}.cmeter i{display:block;height:100%;background:linear-gradient(90deg,#4f8cff,#55e4ff);border-radius:99px}.cnote{font-size:11px;line-height:1.6;color:#8496a1;margin-top:12px}
+.parties{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.party{padding:18px;cursor:pointer;transition:.25s;position:relative;overflow:hidden}.party:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.18)}.partyline{position:absolute;left:0;right:0;top:0;height:3px;background:var(--c)}.partyTop{display:flex;justify-content:space-between}.short{font-size:24px;font-weight:950}.pct{font-size:20px;font-weight:900}.fullname{font-size:11px;color:#879aa6;margin:6px 0 14px}.tags{display:flex;gap:5px;flex-wrap:wrap}.tag{font-size:9px;color:#9aabb4;background:rgba(255,255,255,.05);padding:5px 7px;border-radius:99px}.partyDetails{max-height:0;overflow:hidden;transition:max-height .35s}.party.open .partyDetails{max-height:160px}.detail{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:8px;margin-top:8px;font-size:10px;color:#70838e}.detail strong{color:#dce5e9;text-align:right}
+.lab{display:grid;grid-template-columns:1fr .9fr;gap:12px}.checks{padding:18px;display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.check{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.025);cursor:pointer;font-size:11px}.check:hover{background:rgba(255,255,255,.06)}.check input{accent-color:var(--cyan)}.labResult{padding:28px;display:flex;flex-direction:column;justify-content:center;min-height:300px}.number{font-size:80px;font-weight:950;line-height:.95;letter-spacing:-.07em}.ok .number{color:var(--green)}.message{color:#899ca7;margin-top:10px;font-size:12px}.labmeter{height:11px;background:#152832;border-radius:99px;overflow:hidden;margin-top:24px}.labmeter i{display:block;height:100%;background:linear-gradient(90deg,#4f8cff,#55e4ff);border-radius:99px}
+.pm{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pmrow{display:grid;grid-template-columns:38px 1fr 45px;gap:9px;align-items:center;padding:9px;border-radius:10px}.pmrow:hover{background:rgba(255,255,255,.04)}.pmbar{height:6px;background:#14252f;border-radius:9px;overflow:hidden}.pmbar i{display:block;height:100%;border-radius:9px}
+footer{display:flex;justify-content:space-between;color:#4f6570;font-size:10px;padding:25px 0 45px}
+@media(max-width:1000px){.hero{grid-template-columns:1fr}.heroRight{text-align:left}.grid4{grid-template-columns:repeat(2,1fr)}.twocol,.seatlayout,.lab{grid-template-columns:1fr}.parties{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.app{width:calc(100% - 14px)}.top{top:4px}.nav{display:none}.hero{padding:32px 23px;border-radius:23px}.hero h1{font-size:47px}.grid4,.parties,.coalitions,.blocs,.pm{grid-template-columns:1fr}.checks{grid-template-columns:1fr}.controls{align-items:flex-start;flex-direction:column}.count{font-size:31px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+ <div class="brand"><div class="fern">NZ</div><span>Election Desk</span></div>
+ <nav class="nav">
+  <button class="active" data-view="overview">Overview</button><button data-view="parliament">Parliament</button><button data-view="coalitions">Coalitions</button><button data-view="parties">Parties</button><button data-view="lab">Scenario Lab</button>
+ </nav>
+ <div class="live"><i class="pulse"></i> LIVE MODEL</div>
+</header>
+
+<section class="hero">
+ <div>
+  <div class="kicker">Aotearoa New Zealand · General Election 2026</div>
+  <h1>Who gets to 61?</h1>
+  <p>The race is no longer just National versus Labour. The Greens are surging, TOP is above the threshold, and the numbers are tightening around the coalition line.</p>
+ </div>
+ <div class="heroRight">
+  <div class="label">Election countdown</div><div class="count" id="count">—</div>
+  <div class="datepill">7 November 2026 · 120 seats · 61 majority</div>
+ </div>
+</section>
+<div class="ticker" id="ticker"></div>
+
+<main>
+<div class="controls">
+ <div class="tabs"><button class="active" data-view="overview">Polling</button><button data-view="parliament">Parliament</button><button data-view="coalitions">Coalition map</button><button data-view="parties">Party profiles</button><button data-view="lab">Build a government</button></div>
+ <div class="buttons"><button class="btn" id="pause">Ⅱ Pause</button><button class="btn" id="reset">Reset</button></div>
+</div>
+
+<section id="overview" class="view active">
+ <div class="grid4" id="kpis"></div>
+ <div class="twocol">
+  <article class="card"><div class="head"><div><div class="title">Latest party vote</div><div class="meta">RNZ–Reid Research · 24 Sep–1 Oct · n=1,000</div></div><span class="badge">LATEST</span></div><div class="body"><div class="bars" id="bars"></div></div></article>
+  <article class="card"><div class="head"><div><div class="title">National vs Labour</div><div class="meta">The major-party gap</div></div></div><div class="body"><div id="ranking" class="ranking"></div></div></article>
+ </div>
+ <div class="twocol">
+  <article class="card"><div class="head"><div><div class="title">Polling momentum</div><div class="meta">Model movement around the latest baseline</div></div></div><div class="trend" id="trend"></div></article>
+  <article class="card"><div class="head"><div><div class="title">Election desk feed</div><div class="meta">Dashboard activity</div></div></div><div id="feed" class="feed"></div></article>
+ </div>
+ <div class="blocs">
+  <article class="card bloc"><div class="title">Right bloc</div><div class="meta">National + ACT + NZ First</div><div class="blocbar" id="rightbar"></div><div class="blocMeta"><span id="rightSeats"></span><span>61 needed</span></div></article>
+  <article class="card bloc"><div class="title">Left bloc</div><div class="meta">Labour + Greens + Te Pāti Māori</div><div class="blocbar" id="leftbar"></div><div class="blocMeta"><span id="leftSeats"></span><span>61 needed</span></div></article>
+ </div>
+</section>
+
+<section id="parliament" class="view">
+ <div class="seatlayout">
+  <article class="card parliamentWrap"><div class="head"><div><div class="title">Parliament projection</div><div class="meta">MMP projection from the latest poll · hover a seat</div></div><span class="badge">120 SEATS</span></div><div class="majority"><div class="majorityFill" id="majFill"></div></div><div class="seatmap"><svg id="parliament" class="parliament" viewBox="0 0 1000 520"></svg></div></article>
+  <article class="card"><div class="head"><div><div class="title">Seat ledger</div><div class="meta">Projected composition</div></div></div><div id="seatList" class="seatList"></div></article>
+ </div>
+</section>
+
+<section id="coalitions" class="view">
+ <div class="head" style="padding-left:0"><div><div class="title">The numbers game</div><div class="meta">The supplied poll projection makes TOP the critical wildcard.</div></div></div>
+ <div id="coalitionsGrid" class="coalitions"></div>
+</section>
+
+<section id="parties" class="view">
+ <div class="head" style="padding-left:0"><div><div class="title">Party profiles</div><div class="meta">Click any party to expand</div></div></div>
+ <div id="partiesGrid" class="parties"></div>
+</section>
+
+<section id="lab" class="view">
+ <div class="lab">
+  <article class="card"><div class="head"><div><div class="title">Coalition builder</div><div class="meta">Choose parties. The arithmetic updates instantly.</div></div></div><div id="checks" class="checks"></div></article>
+  <article class="card labResult" id="labResult"><div class="label">Combined seats</div><div id="labNumber" class="number">0</div><div id="labMessage" class="message">Select parties to test a government.</div><div class="labmeter"><i id="labMeter"></i></div></article>
+ </div>
+</section>
+
+<section id="pm" class="view"></section>
+</main>
+<footer><span>Election Desk · Aotearoa New Zealand 2026</span><span>Polling baseline: RNZ–Reid Research · 1 October 2026</span></footer>
+</div>
+
+<script>
+const DATA={"electionDate": "2026-11-07T00:00:00", "pollDate": "24 Sep – 1 Oct 2026", "pollster": "RNZ — Reid Research", "sample": 1000, "totalSeats": 120, "majority": 61, "parties": [{"id": "lab", "short": "LAB", "name": "Labour Party", "pct": 30.8, "seats": 37, "color": "#d52b1e", "bloc": "Left", "leader": "Chris Hipkins", "trend": -1.4}, {"id": "nat", "short": "NAT", "name": "National Party", "pct": 25.9, "seats": 32, "color": "#1b4f9c", "bloc": "Right", "leader": "Christopher Luxon", "trend": -3.2}, {"id": "grn", "short": "GRN", "name": "Green Party", "pct": 14.8, "seats": 18, "color": "#098b45", "bloc": "Left", "leader": "Chlöe Swarbrick", "trend": 4.6}, {"id": "nzf", "short": "NZF", "name": "New Zealand First", "pct": 10.6, "seats": 13, "color": "#151515", "bloc": "Right", "leader": "Winston Peters", "trend": -1.3}, {"id": "act", "short": "ACT", "name": "ACT New Zealand", "pct": 9.0, "seats": 11, "color": "#f4d10a", "bloc": "Right", "leader": "David Seymour", "trend": 1.3}, {"id": "top", "short": "TOP", "name": "The Opportunities Party", "pct": 5.5, "seats": 7, "color": "#f28c28", "bloc": "Wildcard", "leader": "Nicola Willis / TOP leadership", "trend": 0.2}, {"id": "tpm", "short": "TPM", "name": "Te Pāti Māori", "pct": 2.0, "seats": 2, "color": "#5a2a83", "bloc": "Left", "leader": "Debbie Ngarewa-Packer & Rawiri Waititi", "trend": -1.0}], "scenarios": [{"name": "National + ACT + NZ First", "seats": 56, "status": "Short", "note": "The incumbent coalition is five seats short on this poll projection."}, {"name": "Labour + Greens + Te Pāti Māori", "seats": 57, "status": "Short", "note": "The conventional centre-left bloc is four seats short."}, {"name": "Labour + Greens + TOP", "seats": 62, "status": "Majority", "note": "A one-seat majority — TOP becomes pivotal."}, {"name": "National + ACT + NZ First + TOP", "seats": 63, "status": "Majority", "note": "Numerically viable, but National has ruled out working with TOP."}, {"name": "Labour + Greens + Te Pāti Māori + TOP", "seats": 64, "status": "Majority", "note": "A broader centre-left coalition clears the line by three seats."}], "preferredPM": [{"name": "Chris Hipkins", "pct": 21.9, "color": "#d52b1e"}, {"name": "Christopher Luxon", "pct": 17.1, "color": "#1b4f9c"}, {"name": "Winston Peters", "pct": 11.2, "color": "#151515"}, {"name": "Chlöe Swarbrick", "pct": 8.7, "color": "#098b45"}]}, BASE=DATA.parties.map(p=>({...p}));
+const S={paused:false,step:0,hist:[],events:[]};const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)), esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+function time(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function addEvent(t){S.events.unshift({t:new Date(),text:t});S.events=S.events.slice(0,6)}
+function leader(){return [...DATA.parties].sort((a,b)=>b.pct-a.pct)[0]}
+function simulate(){
+ if(S.paused)return;S.step++;
+ DATA.parties.forEach((p,i)=>{let b=BASE.find(x=>x.id===p.id).pct;let d=Math.sin(S.step*.28+i*1.31)*.035+(Math.random()-.5)*.08+(b-p.pct)*.08;p.pct=+clamp(p.pct+d,.5,40).toFixed(1)});
+ if(S.step%3===0)addEvent(`Model pulse · ${leader().short} at ${leader().pct.toFixed(1)}%`);
+ S.hist.push(DATA.parties.map(p=>({id:p.id,pct:p.pct})));if(S.hist.length>26)S.hist.shift();render()
+}
+function render(){
+ const sorted=[...DATA.parties].sort((a,b)=>b.pct-a.pct), l=sorted[0];
+ const right=DATA.parties.filter(p=>['nat','act','nzf'].includes(p.id)).reduce((a,p)=>a+p.seats,0), left=DATA.parties.filter(p=>['lab','grn','tpm'].includes(p.id)).reduce((a,p)=>a+p.seats,0);
+ $('#kpis').innerHTML=[
+  ['Party vote leader',l.short,l.pct.toFixed(1)+'%'],
+  ['Parliament leader','LAB',DATA.parties.find(p=>p.id==='lab').seats+' projected seats'],
+  ['Right bloc',right,right>=61?'majority':'5 short'],
+  ['TOP','5.5%','above 5% threshold']
+ ].map(x=>`<div class="card kpi"><div class="label">${x[0]}</div><div class="big">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join('');
+ $('#bars').innerHTML=sorted.map(p=>`<div class="bar"><div class="code">${p.short}</div><div class="track"><div class="fill" style="--c:${p.color};background:${p.color};width:${p.pct/35*100}%"></div></div><div class="value">${p.pct.toFixed(1)}%</div></div>`).join('');
+ const nl=[DATA.parties.find(p=>p.id==='lab'),DATA.parties.find(p=>p.id==='nat')];
+ $('#ranking').innerHTML=nl.map((p,i)=>`<div class="rank"><div class="rankNo">0${i+1}</div><div><div class="rankName">${p.name}</div><div class="mini"><i style="width:${p.pct/35*100}%;background:${p.color}"></i></div></div><b>${p.pct.toFixed(1)}%</b></div>`).join('')+`<div class="rank"><div class="rankNo">Δ</div><div><div class="rankName">Latest gap</div></div><b>${(nl[0].pct-nl[1].pct).toFixed(1)} pts</b></div>`;
+ $('#ticker').innerHTML=sorted.slice(0,7).map(p=>`<span><b>${p.short}</b> ${p.pct.toFixed(1)}% <em class="${p.trend>=0?'up':'down'}">${p.trend>=0?'▲':'▼'} ${Math.abs(p.trend).toFixed(1)}</em></span>`).join('');
+ $('#rightSeats').textContent=`${right} seats · ${61-right<0?Math.abs(61-right)+' over':' '+(61-right)+' short'}`;
+ $('#leftSeats').textContent=`${left} seats · ${61-left<0?Math.abs(61-left)+' over':' '+(61-left)+' short'}`;
+ const rb=DATA.parties.filter(p=>['nat','act','nzf'].includes(p.id)),lb=DATA.parties.filter(p=>['lab','grn','tpm'].includes(p.id));
+ $('#rightbar').innerHTML=rb.map(p=>`<i style="width:${p.seats/DATA.totalSeats*100}%;background:${p.color}"></i>`).join('');
+ $('#leftbar').innerHTML=lb.map(p=>`<i style="width:${p.seats/DATA.totalSeats*100}%;background:${p.color}"></i>`).join('');
+ drawTrend();drawSeats();drawCoalitions();drawParties();drawLab();
+ $('#feed').innerHTML=S.events.map(e=>`<div class="feeditem"><span class="feedtime">${timeOf(e.t)}</span><span>${esc(e.text)}</span></div>`).join('');
+}
+function timeOf(d){return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function drawTrend(){
+ const W=700,H=200;let lines=DATA.parties.slice(0,5).map(p=>{let pts=S.hist.map((snap,i)=>{let v=snap.find(x=>x.id===p.id)?.pct||0,x=8+i*(W-16)/Math.max(1,S.hist.length-1),y=H-12-v/35*(H-28);return x+','+y}).join(' ');return `<polyline points="${pts}" fill="none" stroke="${p.color}" stroke-width="3" stroke-linecap="round"/>`}).join('');
+ $('#trend').innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="0" y1="${H-12}" x2="${W}" y2="${H-12}" stroke="rgba(255,255,255,.08)"/>${lines}</svg>`;
+}
+function drawSeats(){
+ const svg=$('#parliament');let out='';const seats=[];let n=0;
+ for(let r=0;r<7;r++){let radius=130+r*37,count=17+r*3;for(let j=0;j<count;j++){if(n>=DATA.totalSeats)break;let a=Math.PI*1.08+(Math.PI*.84)*(j/(count-1));seats.push({x:500+radius*Math.cos(a),y:445+radius*Math.sin(a),n:n++})}}
+ let allocation=[];DATA.parties.forEach(p=>{for(let i=0;i<p.seats;i++)allocation.push(p)});allocation.sort((a,b)=>b.seats-a.seats);
+ seats.forEach((s,i)=>{let p=allocation[i%allocation.length];out+=`<circle class="seatdot" cx="${s.x}" cy="${s.y}" r="7" fill="${p.color}"><title>${p.name} · seat ${i+1}</title></circle>`});
+ svg.innerHTML=out;
+ $('#seatList').innerHTML=[...DATA.parties].sort((a,b)=>b.seats-a.seats).map(p=>`<div class="seatRow"><i class="seatColor" style="background:${p.color}"></i><span class="seatName">${p.name}</span><b class="seatNo">${p.seats}</b></div>`).join('');
+ $('#majFill').style.width=(Math.min(100,DATA.parties.reduce((a,p)=>a+p.seats,0)/DATA.totalSeats*100))+'%';
+}
+function drawCoalitions(){$('#coalitionsGrid').innerHTML=DATA.scenarios.map(c=>`<article class="card coalition ${c.seats>=61?'good':''}"><div class="ctop"><div class="cname">${c.name}</div><span class="status">${c.status}</span></div><div class="cseats">${c.seats}</div><div class="meta">seats</div><div class="cmeter"><i style="width:${Math.min(100,c.seats/61*100)}%"></i></div><div class="cnote">${c.note}</div></article>`).join('')}
+function drawParties(){$('#partiesGrid').innerHTML=DATA.parties.map(p=>`<article class="card party" onclick="this.classList.toggle('open')"><i class="partyline" style="--c:${p.color}"></i><div class="partyTop"><div class="short">${p.short}</div><div class="pct">${p.pct.toFixed(1)}%</div></div><div class="fullname">${p.name}</div><div class="tags"><span class="tag">${p.bloc}</span><span class="tag">${p.seats} seats</span><span class="tag">${p.leader}</span></div><div class="partyDetails"><div class="detail"><span>Latest change</span><strong>${p.trend>0?'+':''}${p.trend.toFixed(1)} pts</strong></div><div class="detail"><span>Position</span><strong>${p.bloc}</strong></div><div class="detail"><span>Threshold</span><strong>${p.pct>=5?'Above 5%':'Needs electorate or 5%'}</strong></div></div></article>`).join('')}
+function initChecks(){$('#checks').innerHTML=DATA.parties.map(p=>`<label class="check"><input type="checkbox" value="${p.id}"><i style="width:8px;height:8px;border-radius:3px;background:${p.color}"></i><span>${p.short}</span><b style="margin-left:auto">${p.seats}</b></label>`).join('');$$('#checks input').forEach(x=>x.addEventListener('change',drawLab))}
+function drawLab(){
+ let ids=$$('#checks input:checked').map(x=>x.value),seats=ids.reduce((a,id)=>a+(DATA.parties.find(p=>p.id===id)?.seats||0),0);
+ $('#labNumber').textContent=seats;$('#labMeter').style.width=Math.min(100,seats/61*100)+'%';$('#labResult').classList.toggle('ok',seats>=61);
+ $('#labMessage').textContent=!ids.length?'Select parties to test a government.':seats>=61?`${seats-61} seats above the majority line.`:`${61-seats} seats short of a majority.`;
+}
+function switchView(v){$$('.view').forEach(x=>x.classList.toggle('active',x.id===v));$$('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===v));window.scrollTo({top:0,behavior:'smooth'})}
+$$('[data-view]').forEach(x=>x.addEventListener('click',()=>switchView(x.dataset.view)));
+$('#pause').onclick=()=>{S.paused=!S.paused;$('#pause').textContent=S.paused?'▶ Resume':'Ⅱ Pause'};
+$('#reset').onclick=()=>{DATA.parties.forEach(p=>{let b=BASE.find(x=>x.id===p.id);p.pct=b.pct});S.hist=[DATA.parties.map(p=>({id:p.id,pct:p.pct}))];S.events=[];addEvent('Returned to RNZ–Reid Research baseline');render()};
+function countdown(){let d=new Date(DATA.electionDate)-new Date();if(d<=0){$('#count').textContent='Election day';return}let days=Math.floor(d/86400000),h=Math.floor(d%86400000/3600000),m=Math.floor(d%3600000/60000);$('#count').textContent=`${days}d ${h}h ${m}m`}
+DATA.parties.forEach(p=>p.pct=+p.pct.toFixed(1));S.hist=[DATA.parties.map(p=>({id:p.id,pct:p.pct}))];addEvent('RNZ–Reid Research baseline loaded');initChecks();render();countdown();setInterval(countdown,30000);setInterval(simulate,5000);
+</script>
+</body>
+</html>
